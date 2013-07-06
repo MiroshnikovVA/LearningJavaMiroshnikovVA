@@ -1,0 +1,29 @@
+# X1 = (+ sqrt(b*b – 4ac)-b) / 2a
+# X2 = (- sqrt(b*b – 4ac)-b ) / 2a
+# b*b
+PUSH b
+PUSH b
+*
+# 4ac
+PUSH 4
+PUSH a
+PUSH c
+*
+*
+# b*b – 4ac
+-
+# sqrt(b*b – 4ac)
+SQRT
+# +sqrt(b*b – 4ac)
+PUSH 1
+*
+# +sqrt(b*b – 4ac)-b
+PUSH b
+-
+# 2a
+PUSH 2
+PUSH a
+*
+# (+ sqrt(b*b – 4ac)-b) / 2a
+/
+EXIT

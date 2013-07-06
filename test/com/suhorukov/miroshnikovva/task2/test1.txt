@@ -1,0 +1,7 @@
+# test
+DEFINE a 6
+DEFINE b 4
+PUSH a
+PUSH b
++
+EXIT

@@ -1,0 +1,8 @@
+DEFINE a 5
+DEFINE b 2
+PUSH a
+PUSH a
++
+PUSH b
+*
+EXIT
