@@ -1,9 +1,10 @@
 package com.suhorukov.miroshnikovva.task2.commands;
 
 import com.suhorukov.miroshnikovva.task2.Command;
+import com.suhorukov.miroshnikovva.task2.annotations.CommandFild;
+import com.suhorukov.miroshnikovva.task2.annotations.CommandQuery;
 
 import java.util.EmptyStackException;
-import java.util.HashMap;
 import java.util.Stack;
 
 /**
@@ -17,9 +18,11 @@ public abstract class BinOperator implements Command {
 
     protected abstract double getResult(double num1, double num2);
 
+    @CommandQuery( fields = CommandFild.STACK_FIELD)
+    private Stack<Double> stack = null;
+
     @Override
-    public void execute(Stack<Double> stack, String string, HashMap<String, Double> define) {
-        String[] args = string.split(" ");
+    public void execute(String[] args) {
         if (args.length!=1)
         {
             throw new IllegalArgumentException("Строка имела неверный формат");

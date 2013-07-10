@@ -15,7 +15,7 @@ import java.util.Stack;
  */
 public class Comment implements Command {
     @Override
-    public void execute(Stack<Double> stack, String string, HashMap<String, Double> define) throws IllegalArgumentException, EmptyStackException {
+    public void execute(String[] args) throws IllegalArgumentException, EmptyStackException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }

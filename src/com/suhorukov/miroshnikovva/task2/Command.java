@@ -10,7 +10,7 @@ import java.util.Stack;
 public interface Command {
     /**
      *
-     * @param stack Команда принимает стэк и возможно меняет его
+     *
      */
-    public void execute(Stack<Double> stack, String string, HashMap<String, Double> define) throws IllegalArgumentException, EmptyStackException;
+    public void execute(String[] args) throws IllegalArgumentException, EmptyStackException;
 }

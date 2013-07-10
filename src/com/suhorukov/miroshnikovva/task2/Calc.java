@@ -1,5 +1,7 @@
 package com.suhorukov.miroshnikovva.task2;
 
+import com.suhorukov.miroshnikovva.task2.annotations.CalculatorContext;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -20,9 +22,23 @@ public class Calc {
 
     HashMap<String, Double> define = new HashMap<String, Double>();
 
+    public CalculatorContext getContext()  {
+        return new CalculatorContext() {
+            @Override
+            public Stack<Double> stack() {
+                return stack;
+            }
+
+            @Override
+            public HashMap<String, Double> define() {
+                return define;
+            }
+        };
+    }
+
     public Calc() {
         try {
-            factory = new CommandsFactory();
+            factory = new CommandsFactory(getContext());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (ClassNotFoundException e) {
@@ -54,16 +70,21 @@ public class Calc {
 
     public void executeCommand(String userString){
         System.out.println("Выполняем: " + userString);
-        Command com = factory.getCommandFromUserString(userString);
+        String[] args = userString.split(" ");
+        if (args.length==0){
+               return;
+        }
+        Command com = factory.getCommandFromUserString(args[0]);
         if (com!=null)
-        {   try
         {
-            com.execute(stack, userString, define);
-        }
-        catch (Exception excep)
-        {
-            System.out.println(excep.getMessage());
-        }
+            try
+            {
+                com.execute(args);
+            }
+            catch (Exception excep)
+            {
+                System.out.println(excep.getMessage());
+            }
         }
         else
         {

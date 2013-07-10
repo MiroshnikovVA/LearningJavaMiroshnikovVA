@@ -1,14 +1,13 @@
 package com.suhorukov.miroshnikovva.task2;
 
-import com.suhorukov.miroshnikovva.task2.Command;
-import com.suhorukov.miroshnikovva.task2.commands.*;
+import com.suhorukov.miroshnikovva.task2.annotations.CalculatorContext;
+import com.suhorukov.miroshnikovva.task2.annotations.CommandQuery;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -33,7 +32,7 @@ public class CommandsFactory {
         return com;
     }
 
-    public CommandsFactory() throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public CommandsFactory(CalculatorContext context) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
         Properties prop = new Properties();
         InputStream stream = getClass().getResourceAsStream("commands/commands.properties");
         InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
@@ -50,17 +49,29 @@ public class CommandsFactory {
             {
                 dic.put(keyStr,(Command)obj);
             }
+            while (cls!=Object.class) {
+                Field[] fields = cls.getDeclaredFields();
+                for (Field f : fields){
+                    CommandQuery anno = f.getAnnotation(CommandQuery.class);
+                    if (anno!=null){
+                        f.setAccessible(true);
+                        switch (anno.fields()){
+                            case DEFINE_FIELD:
+                                f.set(obj, context.define());
+                                break;
+                            case STACK_FIELD:
+                                f.set(obj, context.stack());
+                                break;
+                        }
+                    }
+                }
+                cls = cls.getSuperclass();
+            }
         }
     }
 
-    public Command getCommandFromUserString(String userString) {
-        String[] args = userString.split(" ");
-        if (args.length>0)
-        {
-            String com = args[0];
-            return dic.get(com);
-        }
-        return null;
+    public Command getCommandFromUserString(String comName) {
+            return dic.get(comName);
     }
 
     private HashMap<String,Command> dic;
