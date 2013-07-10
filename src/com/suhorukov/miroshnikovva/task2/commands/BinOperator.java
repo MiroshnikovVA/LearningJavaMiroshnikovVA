@@ -8,11 +8,7 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 /**
- * Created with IntelliJ IDEA.
- * User: MiroshnikovVA
- * Date: 29.06.13
- * Time: 12:52
- * To change this template use File | Settings | File Templates.
+ * Общий абстрактный класс для бинарных команд
  */
 public abstract class BinOperator implements Command {
 
@@ -28,23 +24,13 @@ public abstract class BinOperator implements Command {
             throw new IllegalArgumentException("Строка имела неверный формат");
         }
 
-        try
+        if (stack.size()<2)
         {
-            Double num1 = stack.pop();
-            try
-            {
-                Double num2 = stack.pop();
-                stack.push(getResult(num2, num1));
-            }
-            catch (EmptyStackException excep)
-            {
-                stack.push(num1); //Возвращаем исходное состояние
-                throw excep;
-            }
+            throw new EmptyStackException();
         }
-        catch (EmptyStackException excep)
-        {
-            throw excep;
-        }
+
+        Double num1 = stack.pop();
+        Double num2 = stack.pop();
+        stack.push(getResult(num2, num1));
     }
 }

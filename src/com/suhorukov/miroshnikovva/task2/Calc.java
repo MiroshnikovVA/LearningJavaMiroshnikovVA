@@ -9,18 +9,14 @@ import java.util.Scanner;
 import java.util.Stack;
 
 /**
- * Created with IntelliJ IDEA.
- * User: MiroshnikovVA
- * Date: 29.06.13
- * Time: 10:36
- * To change this template use File | Settings | File Templates.
+ * Калькулятор
  */
 public class Calc {
 
     CommandsFactory factory;
-    Stack<Double> stack = new Stack<Double>();
+    Stack<Double> stack = new Stack<>();
 
-    HashMap<String, Double> define = new HashMap<String, Double>();
+    HashMap<String, Double> define = new HashMap<>();
 
     public CalculatorContext getContext()  {
         return new CalculatorContext() {
@@ -39,14 +35,8 @@ public class Calc {
     public Calc() {
         try {
             factory = new CommandsFactory(getContext());
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (InstantiationException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException  e) {
+            e.printStackTrace();
         }
     }
 
