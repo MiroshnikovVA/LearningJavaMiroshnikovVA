@@ -2,29 +2,27 @@ package com.suhorukov.miroshnikovva.task2;
 
 import com.suhorukov.miroshnikovva.task2.annotations.CalculatorContext;
 import com.suhorukov.miroshnikovva.task2.annotations.CommandQuery;
+import org.apache.log4j.Logger;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Properties;
 
 /**
- * Created with IntelliJ IDEA.
- * User: MiroshnikovVA
- * Date: 27.06.13
- * Time: 16:09
- * To change this template use File | Settings | File Templates.
+ * Фабрика команд
  */
 public class CommandsFactory {
 
-    public Command GetCommand(String s) throws IllegalArgumentException {
-        String[] args = s.split(" ");
-        if (s=="" || s==null)
+    public Command getCommand(String s) throws IllegalArgumentException {
+        if (s.isEmpty())
         {
             throw new IllegalArgumentException("Строка пустая");
         }
+        String[] args = s.split(" ");
         Command com = dic.get(args[0]);
         if (com == null)          {
             throw new IllegalArgumentException("Неизвестная команда " + args[0]);
@@ -32,13 +30,16 @@ public class CommandsFactory {
         return com;
     }
 
-    public CommandsFactory(CalculatorContext context) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+    private final static Logger logger = Logger.getLogger(CommandsFactory.class);
+
+    public CommandsFactory(final CalculatorContext context) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
         Properties prop = new Properties();
         InputStream stream = getClass().getResourceAsStream("commands/commands.properties");
         InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
         prop.load(reader);
+        stream.close();
         System.out.println(prop.toString());
-        dic = new HashMap<String, Command>();
+        dic = new HashMap<>();
         for (Object key : prop.keySet())
         {
             String keyStr = key.toString();
@@ -47,7 +48,27 @@ public class CommandsFactory {
             Object obj =  cls.newInstance();
             if (obj instanceof Command)  //Если загрузен нужный класс
             {
-                dic.put(keyStr,(Command)obj);
+
+                final Command realCommand = (Command)obj;
+                InvocationHandler handler = new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        //if ("execute".equals(method.getName())){ }
+                        logger.debug("-------------------------");
+                        logger.debug("Вызван метод " + method.getName()
+                                + " объекта типа " + realCommand.getClass().getName());
+                        logger.debug("Стек до вызова команды: " + context.stack());
+                        Object rez = method.invoke(realCommand, args);
+                        logger.debug("Стек после вызова команды: " + context.stack());
+                        logger.debug("-------------------------");
+                        return rez;
+                    }
+                } ;
+                Command proxyCommand = (Command) Proxy.newProxyInstance(Command.class.getClassLoader(),
+                        new Class[]{Command.class},
+                        handler);
+                //тут добавить прокси
+                dic.put(keyStr, proxyCommand);
             }
             while (cls!=Object.class) {
                 Field[] fields = cls.getDeclaredFields();

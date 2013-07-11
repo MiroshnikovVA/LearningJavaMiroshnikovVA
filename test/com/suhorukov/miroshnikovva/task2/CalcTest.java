@@ -1,23 +1,17 @@
 package com.suhorukov.miroshnikovva.task2;
 
 import junit.framework.TestCase;
+import org.apache.log4j.xml.DOMConfigurator;
 
 import java.io.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: MiroshnikovVA
- * Date: 29.06.13
- * Time: 10:36
- * To change this template use File | Settings | File Templates.
+ * Юнит тест для калькулятора
  */
 public class CalcTest extends TestCase {
 
-    private BufferedReader BufferedReaderFromResurs(String name) throws UnsupportedEncodingException {
-        InputStream stream = getClass().getResourceAsStream("com/suhorukov/miroshnikovva/task2/X1");
-        InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
-        BufferedReader br = new BufferedReader(reader);
-        return br;
+    {
+        DOMConfigurator.configure(getClass().getResource("log4j.xml"));
     }
 
     private double simpleCalcFromFile(String fileName)
