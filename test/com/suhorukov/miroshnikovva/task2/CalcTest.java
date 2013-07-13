@@ -10,8 +10,9 @@ import java.io.*;
  */
 public class CalcTest extends TestCase {
 
+    static
     {
-        DOMConfigurator.configure(getClass().getResource("log4j.xml"));
+        DOMConfigurator.configure(CalcTest.class.getResource("log4j.xml"));
     }
 
     private double simpleCalcFromFile(String fileName)
