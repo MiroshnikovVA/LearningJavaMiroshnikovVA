@@ -3,6 +3,8 @@ package com.suhorukov.miroshnikovva.dirindexhtml;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Time;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -39,7 +41,11 @@ class FileView extends ElementOfTheFileSystemView {
         String size = l>1024*10?file.length()/1024 + " кбайт":file.length() + " байт";
         String name = file.getName();
         stream.append("<a href=\"");
-        stream.append(name);
+        try {
+            stream.append(URLEncoder.encode(name,"UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            stream.append(name);
+        }
         stream.append("\">");
         stream.append(name);
         stream.append("</a>");

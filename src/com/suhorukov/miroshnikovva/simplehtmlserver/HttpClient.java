@@ -6,6 +6,7 @@ import com.suhorukov.miroshnikovva.dirindexhtml.Http404Exception;
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.util.Date;
 
 /**
@@ -70,6 +71,7 @@ public class HttpClient implements Runnable {
 
     void writeFromGet(String get, OutputStream out) throws IOException {
         System.out.println("Отправляем ответ");
+        get = URLDecoder.decode(get,"UTF-8");
         // пишем ответ
         String s = null;
         File file = new File(generator.getHomeDir()+get);

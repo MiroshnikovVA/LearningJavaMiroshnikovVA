@@ -3,6 +3,8 @@ package com.suhorukov.miroshnikovva.dirindexhtml;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,7 +36,11 @@ class DirView extends ElementOfTheFileSystemView {
     public void print(StringBuilder stream) {
         String name = file.getName();
         stream.append("<b><a href=\"");
-        stream.append(name);
+        try {
+            stream.append(URLEncoder.encode(name, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            stream.append(name);
+        }
         stream.append("/\">");
         stream.append(name);
         stream.append("/</a></b>");
