@@ -7,6 +7,8 @@ import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.net.Socket;
 import java.net.URLDecoder;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.Date;
 
 /**
@@ -27,10 +29,11 @@ public class HttpClient implements Runnable {
 
     @Override
     public void run() {
+        OutputStream output = null;
         try {
             InputStream input = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-            OutputStream output = socket.getOutputStream();
+            output = socket.getOutputStream();
             //OutputStreamWriter writer = new OutputStreamWriter(output);
             String line = "";
             String get = "";
@@ -50,14 +53,23 @@ public class HttpClient implements Runnable {
             if (!get.isEmpty()){
                 //Требуется ответ от сервера
                 writeFromGet(get, output);
+            } else {
+                write501(output);
             }
             //writer.close();
             output.close();
             System.out.println("Обработчик завершил работу");
         }
-        catch (IOException ex) {
-            ex.printStackTrace();
-    }
+        catch (Exception ex) {
+            if (output!=null) {
+                try {
+                    ex.printStackTrace();
+                    write500(output, ex);
+                } catch (IOException e) {
+
+                }
+            }
+        }
     }
 
     void write404(OutputStream out) throws IOException {
@@ -69,9 +81,41 @@ public class HttpClient implements Runnable {
         System.out.println("По сети отправлена ошибка 404");
     }
 
+    //Неизвестная команда - 501 Not Implemented
+    void write501(OutputStream out) throws IOException {
+        //Вызываем метод, который пишет 501
+        out.write("HTTP/1.0 501 fuck!\r\n".getBytes());
+        //пустая строка отделяет заголовки от тела
+        out.write("\r\n".getBytes());
+        out.flush();
+        System.out.println("По сети отправлена ошибка 501");
+    }
+
+    //Если произошло исключение - 500 и текст ошибки
+    void write500(OutputStream out, Exception ex) throws IOException {
+        String mes = ex.getMessage();
+        byte[] bytes = (mes!=null)?mes.getBytes("Cp1251"):ex.getClass().getName().getBytes("Cp1251");
+        //Вызываем метод, который пишет 501
+        out.write("HTTP/1.0 500 exception\r\n".getBytes());
+        //минимально необходимые заголовки, тип и длина
+        out.write("Content-Type: text/html\r\n".getBytes());
+        out.write(("Content-Length: "+bytes.length+"\r\n").getBytes());
+        //пустая строка отделяет заголовки от тела
+        out.write("\r\n".getBytes());
+        //тело
+        out.write(bytes);
+        out.flush();
+        System.out.println("По сети отправлена ошибка 500");
+    }
+
     void writeFromGet(String get, OutputStream out) throws IOException {
         System.out.println("Отправляем ответ");
         get = URLDecoder.decode(get,"UTF-8");
+
+        if ("/exception".equals(get)) {
+            throw new IOException("Тестовый эксепшен");
+        }
+
         // пишем ответ
         String s = null;
         File file = new File(generator.getHomeDir()+get);
@@ -108,7 +152,7 @@ public class HttpClient implements Runnable {
             System.out.println("По сети отправлено HTML страница: "+ s);
         }
         else {    //Отправляем файл
-            String contentType = new MimetypesFileTypeMap().getContentType(file);
+            String contentType =   java.nio.file.Files.probeContentType(FileSystems.getDefault().getPath(file.getAbsolutePath()));
             //пишем статус ответа
             out.write("HTTP/1.0 200 OK\r\n".getBytes());
             //минимально необходимые заголовки, тип и длина
