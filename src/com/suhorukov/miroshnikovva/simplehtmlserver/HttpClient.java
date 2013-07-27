@@ -78,6 +78,12 @@ public class HttpClient implements Runnable {
             write404(out);
         }
 
+        //открытие файла index.html
+        File indexhtmFile = new File(generator.getHomeDir()+get + "/index.html");
+        if (indexhtmFile.exists() & indexhtmFile.isFile()) {
+            file = indexhtmFile;
+        }
+
         if (file.isDirectory())  {
             try {
                 s = generator.generateHtml(get);
@@ -104,7 +110,11 @@ public class HttpClient implements Runnable {
             //пишем статус ответа
             out.write("HTTP/1.0 200 OK\r\n".getBytes());
             //минимально необходимые заголовки, тип и длина
-            out.write(("Content-Type: "+ contentType + "\r\n").getBytes());
+            if (file == indexhtmFile) {
+                out.write("Content-Type: text/html\r\n".getBytes());
+            } else   {
+                out.write(("Content-Type: "+ contentType + "\r\n").getBytes());
+            }
             out.write(("Content-Length: "+file.length()+"\r\n").getBytes());
             out.write(("Last-Modified: " + new Date(file.lastModified()) + "\r\n").getBytes());
 
